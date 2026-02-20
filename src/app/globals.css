@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+/* === JooLife Design System === */
+@theme inline {
+  /* Primary */
+  --color-black: #1A1A1A;
+  --color-white: #FFFFFF;
+  --color-off-white: #FAFAF8;
+
+  /* Accent (Brand Orange) */
+  --color-accent: #FF6B35;
+  --color-accent-light: #FF8F65;
+  --color-accent-dark: #E55A2B;
+  --color-accent-bg: #FFF4EF;
+
+  /* Secondary (Teal) */
+  --color-secondary: #2EC4B6;
+
+  /* Grays */
+  --color-gray-100: #F5F5F3;
+  --color-gray-200: #E8E8E4;
+  --color-gray-300: #D1D1CC;
+  --color-gray-400: #A3A39E;
+  --color-gray-500: #6B6B66;
+  --color-gray-600: #4A4A46;
+  --color-gray-700: #333330;
+
+  /* Functional */
+  --color-success: #27AE60;
+  --color-error: #E74C3C;
+
+  /* Fonts */
+  --font-heading: var(--font-noto-serif-kr);
+  --font-body: "Pretendard Variable", "Pretendard", -apple-system, "Segoe UI", sans-serif;
+  --font-sans: "Pretendard Variable", "Pretendard", -apple-system, "Segoe UI", sans-serif;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 16px 50px rgba(0, 0, 0, 0.15);
+}
+
+/* === Base Styles === */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body), -apple-system, "Segoe UI", sans-serif;
+  color: var(--color-black);
+  background-color: var(--color-white);
+  line-height: 1.7;
+}
+
+/* === Selection === */
+::selection {
+  background-color: var(--color-accent-bg);
+  color: var(--color-accent-dark);
+}
+
+/* === Scrollbar === */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-gray-300);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gray-400);
+}
