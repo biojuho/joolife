@@ -3,80 +3,82 @@
 @tailwind utilities;
 
 @layer base {
-  /* Dark theme (default) */
   :root {
-    --background: 240 33% 8%;
-    --foreground: 240 10% 90%;
-
-    --card: 240 28% 12%;
-    --card-foreground: 240 10% 90%;
-
-    --popover: 240 28% 12%;
-    --popover-foreground: 240 10% 90%;
-
-    --primary: 249 76% 63%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 168 100% 36%;
-    --secondary-foreground: 0 0% 100%;
-
-    --muted: 240 20% 18%;
-    --muted-foreground: 240 10% 60%;
-
-    --accent: 45 97% 71%;
-    --accent-foreground: 240 33% 8%;
-
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 240 20% 18%;
-    --input: 240 20% 18%;
-    --ring: 249 76% 63%;
-
-    --radius: 0.75rem;
+    --font-pretendard: "Pretendard Variable", Pretendard, -apple-system,
+      BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI",
+      "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic",
+      "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
   }
 
-  /* Light theme */
-  .light {
-    --background: 0 0% 98%;
-    --foreground: 240 33% 8%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 240 33% 8%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 33% 8%;
-
-    --primary: 249 76% 63%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 168 100% 36%;
-    --secondary-foreground: 0 0% 100%;
-
-    --muted: 240 5% 93%;
-    --muted-foreground: 240 5% 35%;
-
-    --accent: 45 97% 71%;
-    --accent-foreground: 240 33% 8%;
-
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
-    --ring: 249 76% 63%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
   }
 
   body {
-    @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    @apply bg-cream text-text antialiased;
+    font-family: var(--font-pretendard);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Safe area for mobile bottom nav */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+@layer components {
+  /* Score circle */
+  .score-circle {
+    @apply relative flex items-center justify-center;
+  }
+
+  .score-circle svg {
+    transform: rotate(-90deg);
+  }
+
+  /* Category badge colors */
+  .badge-diet {
+    @apply bg-green-100 text-green-700;
+  }
+  .badge-exercise {
+    @apply bg-blue-100 text-blue-700;
+  }
+  .badge-sleep {
+    @apply bg-purple-100 text-purple-700;
+  }
+  .badge-lifestyle {
+    @apply bg-orange-100 text-orange-700;
+  }
+  .badge-science {
+    @apply bg-indigo-100 text-indigo-700;
+  }
+  .badge-mindset {
+    @apply bg-pink-100 text-pink-700;
+  }
+
+  /* Content gate blur */
+  .content-blur {
+    @apply relative;
+  }
+  .content-blur::after {
+    content: "";
+    @apply absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-cream to-transparent;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Hide scrollbar */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }

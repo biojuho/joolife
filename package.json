@@ -1,5 +1,5 @@
 {
-  "name": "slowage",
+  "name": "temp-next",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,20 +9,21 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@radix-ui/react-progress": "^1.1.8",
-    "@radix-ui/react-slot": "^1.2.4",
+    "@anthropic-ai/sdk": "^0.77.0",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.97.0",
-    "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "html2canvas-pro": "^1.6.7",
+    "date-fns": "^4.1.0",
+    "dayjs": "^1.11.19",
+    "gray-matter": "^4.0.3",
     "lucide-react": "^0.574.0",
     "next": "14.2.35",
+    "next-mdx-remote": "^6.0.0",
     "react": "^18",
     "react-dom": "^18",
+    "reading-time": "^1.5.0",
     "recharts": "^3.7.0",
     "tailwind-merge": "^3.5.0",
-    "tailwindcss-animate": "^1.0.7",
     "zustand": "^5.0.11"
   },
   "devDependencies": {
