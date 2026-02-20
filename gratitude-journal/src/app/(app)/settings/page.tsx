@@ -7,7 +7,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { LogOut, Flame, BookOpen, Edit3 } from "lucide-react";
+import { LogOut, Flame, BookOpen, Edit3, ChevronRight } from "lucide-react";
+import Link from "next/link";
 import type { Profile } from "@/lib/types";
 import { LIFE_THEMES } from "@/lib/types";
 
@@ -202,6 +203,22 @@ export default function SettingsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* My Story link */}
+      <Link href="/my-story">
+        <Card className="mb-6 border-warm-200 bg-white hover:bg-warm-50 transition-colors cursor-pointer">
+          <CardContent className="flex items-center justify-between py-4">
+            <div className="flex items-center gap-3">
+              <BookOpen className="h-5 w-5 text-warm-500" />
+              <div>
+                <p className="font-medium text-warm-800">나의 인생 이야기</p>
+                <p className="text-sm text-warm-500">기록을 인생책으로 만들기</p>
+              </div>
+            </div>
+            <ChevronRight className="h-5 w-5 text-warm-400" />
+          </CardContent>
+        </Card>
+      </Link>
 
       <Separator className="my-4 bg-warm-100" />
 

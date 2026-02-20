@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowLeft, Sparkles, Trash2 } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { ko } from "date-fns/locale";
 import type { JournalEntry } from "@/lib/types";
@@ -17,6 +17,23 @@ export default function EntryDetailPage() {
   const supabase = createClient();
   const [entry, setEntry] = useState<JournalEntry | null>(null);
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!entry || !confirm("이 기록을 삭제할까요? 되돌릴 수 없어요.")) return;
+
+    setDeleting(true);
+    try {
+      await fetch("/api/journal", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: entry.id }),
+      });
+      router.push("/journal/calendar");
+    } catch {
+      setDeleting(false);
+    }
+  };
 
   useEffect(() => {
     const fetchEntry = async () => {
@@ -136,6 +153,19 @@ export default function EntryDetailPage() {
           ))}
         </div>
       )}
+
+      {/* Delete */}
+      <div className="mt-8 text-center">
+        <Button
+          variant="ghost"
+          onClick={handleDelete}
+          disabled={deleting}
+          className="text-sm text-red-400 hover:bg-red-50 hover:text-red-600"
+        >
+          <Trash2 className="mr-1 h-4 w-4" />
+          {deleting ? "삭제 중..." : "이 기록 삭제하기"}
+        </Button>
+      </div>
     </div>
   );
 }

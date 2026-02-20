@@ -46,5 +46,20 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // 온보딩 완료 여부 체크 (인증된 사용자, 온보딩 페이지가 아닌 경우)
+  if (user && !isPublicPath && request.nextUrl.pathname !== "/onboarding") {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("nickname")
+      .eq("id", user.id)
+      .single();
+
+    if (!profile?.nickname) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/onboarding";
+      return NextResponse.redirect(url);
+    }
+  }
+
   return supabaseResponse;
 }
