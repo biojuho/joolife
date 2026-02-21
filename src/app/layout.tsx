@@ -10,15 +10,42 @@ const notoSerifKR = Noto_Serif_KR({
 });
 
 export const metadata: Metadata = {
-  title: "JooLife (쥬라프) | 라이프스타일 컨설팅",
+  title: {
+    default: "JooLife (쥬라프) | AI 라이프스타일 매니저",
+    template: "%s | JooLife",
+  },
   description:
-    "JooLife(쥬라프) - 라이프스타일 컨설팅 서비스. 당신의 삶에 활력을 더합니다.",
+    "JooLife(쥬라프) - AI 기반 라이프스타일 매니지먼트 플랫폼. 콘텐츠 큐레이션, AI 추천, 자동화를 통해 삶에 활력을 더합니다.",
+  keywords: [
+    "JooLife",
+    "쥬라프",
+    "라이프스타일",
+    "AI",
+    "콘텐츠 관리",
+    "Web3",
+    "자동화",
+  ],
+  authors: [{ name: "JooLife Team" }],
+  creator: "JooLife",
+  metadataBase: new URL("https://joolife.io.kr"),
   openGraph: {
-    title: "JooLife - 라이프스타일 컨설팅",
-    description: "당신의 삶에 활력을 더하는 라이프스타일 파트너",
+    title: "JooLife - AI 라이프스타일 매니저",
+    description:
+      "AI 기반 콘텐츠 큐레이션, 맞춤 추천, 자동화로 당신의 삶을 관리하세요.",
     url: "https://joolife.io.kr",
+    siteName: "JooLife",
     type: "website",
     locale: "ko_KR",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "JooLife - AI 라이프스타일 매니저",
+    description:
+      "AI 기반 콘텐츠 큐레이션, 맞춤 추천, 자동화로 당신의 삶을 관리하세요.",
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
