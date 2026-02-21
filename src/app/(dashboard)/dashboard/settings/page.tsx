@@ -14,6 +14,7 @@ import {
   Check,
   ChevronLeft,
   Mail,
+  Wallet,
 } from "lucide-react";
 import {
   getProfile,
@@ -39,6 +40,9 @@ const tabsList = [
   { key: "privacy" as const, icon: Shield, title: "개인정보 & 보안", description: "데이터 동의, 보안" },
   { key: "language" as const, icon: Globe, title: "언어", description: "서비스 언어 설정" },
 ];
+
+// Separate link for wallet (navigates to sub-page)
+const walletLink = { icon: Wallet, title: "Web3 지갑", description: "블록체인 지갑 연결 및 관리", href: "/dashboard/settings/wallet" };
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<SettingsTab | null>(null);
@@ -186,6 +190,27 @@ export default function SettingsPage() {
               </button>
             );
           })}
+
+          {/* Web3 Wallet Link */}
+          <a
+            href={walletLink.href}
+            className="w-full bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl border border-purple-200/60 p-5 flex items-center gap-4 hover:shadow-sm transition-shadow text-left block"
+          >
+            <div className="w-11 h-11 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">
+              <walletLink.icon size={20} className="text-purple-600" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-[#1A1A1A] text-sm">
+                {walletLink.title}
+              </h3>
+              <p className="text-[#A3A39E] text-xs mt-0.5">
+                {walletLink.description}
+              </p>
+            </div>
+            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-purple-100 text-purple-600">
+              Web3
+            </span>
+          </a>
         </div>
       </div>
     );

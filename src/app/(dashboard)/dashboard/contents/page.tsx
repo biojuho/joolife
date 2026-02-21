@@ -16,6 +16,7 @@ import { getContents, type ContentType } from "@/lib/actions/contents";
 import { getCategories } from "@/lib/actions/categories";
 import ContentCard from "@/components/contents/ContentCard";
 import SaveContentModal from "@/components/contents/SaveContentModal";
+import ContentDetailModal from "@/components/contents/ContentDetailModal";
 
 interface Category {
   id: string;
@@ -30,9 +31,12 @@ interface ContentItem {
   description: string | null;
   url: string | null;
   memo: string | null;
+  image_url: string | null;
   is_archived: boolean;
   created_at: string;
+  updated_at: string;
   categories: { id: string; name: string; color: string } | null;
+  tags?: string[];
 }
 
 export default function ContentsPage() {
@@ -41,6 +45,7 @@ export default function ContentsPage() {
   const [loading, setLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedContent, setSelectedContent] = useState<ContentItem | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   // Filters
@@ -275,7 +280,9 @@ export default function ContentsPage() {
           }
         >
           {contents.map((content) => (
-            <ContentCard key={content.id} content={content} />
+            <div key={content.id} onClick={() => setSelectedContent(content)} className="cursor-pointer">
+              <ContentCard content={content} />
+            </div>
           ))}
         </div>
       )}
@@ -288,6 +295,16 @@ export default function ContentsPage() {
           fetchContents();
         }}
       />
+
+      {/* Detail Modal */}
+      {selectedContent && (
+        <ContentDetailModal
+          content={selectedContent}
+          isOpen={!!selectedContent}
+          onClose={() => setSelectedContent(null)}
+          onUpdate={fetchContents}
+        />
+      )}
     </div>
   );
 }
