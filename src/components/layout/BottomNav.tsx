@@ -18,7 +18,7 @@ export default function BottomNav() {
   if (hiddenPaths.includes(pathname)) return null;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/90 backdrop-blur-xl safe-area-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/90 backdrop-blur-xl safe-area-bottom" aria-label="하단 네비게이션">
       <div className="max-w-lg mx-auto flex items-center justify-around py-2">
         {NAV_ITEMS.map((item) => {
           const isActive =
@@ -30,13 +30,15 @@ export default function BottomNav() {
             <Link
               key={item.href}
               href={item.href}
+              aria-label={item.label}
+              aria-current={isActive ? "page" : undefined}
               className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg transition-colors ${
                 isActive
                   ? "text-primary"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <span className="text-lg">{item.emoji}</span>
+              <span className="text-lg" aria-hidden="true">{item.emoji}</span>
               <span className="text-[10px] font-medium">{item.label}</span>
             </Link>
           );

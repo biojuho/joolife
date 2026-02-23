@@ -5,7 +5,3 @@ export function calculateTotalScore(scores: number[]): number {
   const sum = scores.reduce((acc, val) => acc + val, 0);
   return Math.round(((sum - 5) / 20) * 100);
 }
-
-export function clampScore(value: number, min = 1, max = 5): number {
-  return Math.max(min, Math.min(max, value));
-}
