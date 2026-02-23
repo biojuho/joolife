@@ -47,11 +47,14 @@ export default function CheckCard({
         </div>
 
         {/* 5-level score buttons */}
-        <div className="flex gap-3 w-full max-w-sm justify-center">
+        <div className="flex gap-3 w-full max-w-sm justify-center" role="radiogroup" aria-label={`${label} 점수 선택`}>
           {[1, 2, 3, 4, 5].map((value) => (
             <button
               key={value}
               onClick={() => onSelect(value)}
+              role="radio"
+              aria-checked={selectedValue === value}
+              aria-label={`${label} ${SCORE_LABELS[value]} ${value}점`}
               className={cn(
                 "flex flex-col items-center gap-2 py-4 px-3 rounded-xl border-2 transition-all duration-200 flex-1 min-w-0",
                 "hover:scale-105 active:scale-95",

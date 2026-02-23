@@ -100,16 +100,28 @@ export default function ShareActions({
         }
       }
 
-      // Fallback: copy to clipboard
-      await navigator.clipboard.write([
-        new ClipboardItem({ "image/png": blob }),
-      ]);
-      setShareResult("copied");
+      // Fallback: copy image to clipboard (with browser compat check)
+      if (typeof ClipboardItem !== "undefined" && navigator.clipboard?.write) {
+        await navigator.clipboard.write([
+          new ClipboardItem({ "image/png": blob }),
+        ]);
+        setShareResult("copied");
+      } else {
+        // Final fallback: download the image instead
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.download = `slowage-${date}.png`;
+        link.href = url;
+        link.click();
+        URL.revokeObjectURL(url);
+        setShareResult("saved");
+      }
     } catch (err) {
       // User cancelled share dialog — not an error
       if (err instanceof Error && err.name === "AbortError") {
         setShareResult("idle");
       } else {
+        console.error("Share failed:", err);
         setShareResult("error");
       }
     } finally {
