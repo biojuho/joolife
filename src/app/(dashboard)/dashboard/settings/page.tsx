@@ -46,7 +46,7 @@ const walletLink = { icon: Wallet, title: "Web3 지갑", description: "블록체
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<SettingsTab | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [, setProfile] = useState<Profile | null>(null);
   const [preferences, setPreferences] = useState<UserPreferences | null>(null);
   const [email, setEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);

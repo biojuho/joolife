@@ -130,17 +130,31 @@ export async function deleteAccount(): Promise<void> {
 
   if (!user) return;
 
-  // 활동 로그 기록 (삭제 전)
-  await supabase.from("activity_logs").insert({
-    user_id: user.id,
-    action: "delete_account",
-    entity_type: "user",
-  });
+  // 사용자 데이터 삭제 (RLS가 적용되므로 user_id 매칭 필수)
+  await Promise.all([
+    supabase.from("wallet_connections").delete().eq("user_id", user.id),
+    supabase.from("recommendations").delete().eq("user_id", user.id),
+    supabase.from("activity_logs").delete().eq("user_id", user.id),
+  ]);
 
-  // Supabase에서 사용자 삭제는 서버 사이드에서 admin API 필요
-  // 여기서는 프로필만 비활성화
+  // automations 삭제 (automation_logs도 CASCADE로 삭제됨)
+  await supabase.from("automations").delete().eq("user_id", user.id);
+
+  // contents 삭제 (content_tags도 CASCADE로 삭제됨)
+  await supabase.from("saved_contents").delete().eq("user_id", user.id);
+
+  // categories 삭제
+  await supabase.from("categories").delete().eq("user_id", user.id);
+
+  // preferences 삭제
+  await supabase.from("user_preferences").delete().eq("user_id", user.id);
+
+  // 프로필 익명화 (auth.users 삭제는 Supabase Admin API 필요)
   await supabase
     .from("profiles")
-    .update({ display_name: "[삭제된 계정]", bio: null, interests: [] })
+    .update({ display_name: "[삭제된 계정]", bio: null, avatar_url: null, interests: [] })
     .eq("id", user.id);
+
+  // 로그아웃
+  await supabase.auth.signOut();
 }

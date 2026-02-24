@@ -12,8 +12,6 @@ import {
   Power,
   Clock,
   CheckCircle,
-  XCircle,
-  AlertTriangle,
   Activity,
 } from "lucide-react";
 import {

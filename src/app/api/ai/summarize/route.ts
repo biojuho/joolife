@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     // AI 요약 생성
     const result = await summarizeContent({ title, url, memo, description });
 
-    // content_id가 있으면 DB 업데이트
+    // content_id가 있으면 DB 업데이트 (소유권 검증)
     if (content_id) {
       // 설명 업데이트
       if (result.summary) {
@@ -29,7 +29,8 @@ export async function POST(request: NextRequest) {
             description: result.summary,
             metadata: { ai_summarized: true, ai_category: result.category_suggestion },
           })
-          .eq("id", content_id);
+          .eq("id", content_id)
+          .eq("user_id", user.id);
       }
 
       // 태그 추가
