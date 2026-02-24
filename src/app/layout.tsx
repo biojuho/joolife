@@ -1,34 +1,27 @@
-import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import type { Metadata } from "next";
 import "./globals.css";
-import BottomNav from "@/components/layout/BottomNav";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
-  title: "SlowAge | 슬로에이지 - 매일의 슬로에이징 점수",
+  title: {
+    default: "슬로에이징 코치 | 12주 저속노화 프로그램",
+    template: "%s | 슬로에이징 코치",
+  },
   description:
-    "하루 5가지 건강 체크로 나만의 슬로에이징 점수를 확인하세요. 수면, 운동, 식단, 스트레스, 소셜 — 매일 기록하고, 변화를 추적하세요.",
+    "식단, 운동, 수면을 AI가 분석해 개인화된 저속노화 코칭을 받아보세요. 매일 5분 체크리스트로 생체나이를 되돌립니다.",
   keywords: [
+    "저속노화",
     "슬로에이징",
+    "안티에이징",
+    "웰에이징",
     "건강관리",
-    "건강점수",
-    "슬로에이지",
-    "slow aging",
-    "health tracker",
+    "생체나이",
   ],
-  authors: [{ name: "JooLife" }],
-};
-
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-  themeColor: "#0F0F1A",
+  openGraph: {
+    title: "슬로에이징 코치 — 나이는 숫자일 뿐",
+    description: "12주 저속노화 프로그램으로 과학적으로 노화 속도를 늦추세요",
+    type: "website",
+    locale: "ko_KR",
+  },
 };
 
 export default function RootLayout({
@@ -37,25 +30,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className="dark" suppressHydrationWarning>
+    <html lang="ko">
       <head>
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" />
         <link
           rel="stylesheet"
-          as="style"
-          crossOrigin="anonymous"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
         />
       </head>
-      <body
-        className={`${inter.variable} font-sans antialiased min-h-screen`}
-        style={{
-          fontFamily:
-            "'Pretendard Variable', var(--font-inter), system-ui, sans-serif",
-        }}
-      >
-        {children}
-        <BottomNav />
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

@@ -1,45 +1,55 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Home, ClipboardCheck, Users, BarChart3, User } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-const NAV_ITEMS = [
-  { href: "/", label: "홈", emoji: "🏠" },
-  { href: "/check", label: "체크", emoji: "✅" },
-  { href: "/dashboard", label: "대시보드", emoji: "📊" },
-  { href: "/settings", label: "설정", emoji: "⚙️" },
+interface NavItem {
+  href: string;
+  label: string;
+  icon: typeof Home;
+}
+
+const navItems: NavItem[] = [
+  { href: '/dashboard', label: '홈', icon: Home },
+  { href: '/checklist', label: '체크리스트', icon: ClipboardCheck },
+  { href: '/community', label: '커뮤니티', icon: Users },
+  { href: '/reports', label: '리포트', icon: BarChart3 },
+  { href: '/mypage', label: 'MY', icon: User },
 ];
 
-export default function BottomNav() {
+function BottomNav() {
   const pathname = usePathname();
 
-  // Don't show on landing, login, onboarding pages
-  const hiddenPaths = ["/", "/login", "/onboarding"];
-  if (hiddenPaths.includes(pathname)) return null;
-
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/90 backdrop-blur-xl safe-area-bottom" aria-label="하단 네비게이션">
-      <div className="max-w-lg mx-auto flex items-center justify-around py-2">
-        {NAV_ITEMS.map((item) => {
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-cream-darker bg-white safe-area-bottom">
+      <div className="mx-auto flex h-16 max-w-lg items-center justify-around px-2">
+        {navItems.map((item) => {
           const isActive =
-            item.href === "/"
-              ? pathname === "/"
-              : pathname.startsWith(item.href);
+            pathname === item.href || pathname?.startsWith(`${item.href}/`);
+          const Icon = item.icon;
 
           return (
             <Link
               key={item.href}
               href={item.href}
-              aria-label={item.label}
-              aria-current={isActive ? "page" : undefined}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg transition-colors ${
-                isActive
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+              className={cn(
+                'flex flex-1 flex-col items-center gap-0.5 py-1 transition-colors duration-200',
+                isActive ? 'text-primary' : 'text-text-lighter',
+              )}
             >
-              <span className="text-lg" aria-hidden="true">{item.emoji}</span>
-              <span className="text-[10px] font-medium">{item.label}</span>
+              <Icon
+                className={cn('h-5 w-5', isActive && 'stroke-[2.5]')}
+              />
+              <span
+                className={cn(
+                  'text-[10px]',
+                  isActive ? 'font-semibold' : 'font-medium',
+                )}
+              >
+                {item.label}
+              </span>
             </Link>
           );
         })}
@@ -47,3 +57,5 @@ export default function BottomNav() {
     </nav>
   );
 }
+
+export { BottomNav };
