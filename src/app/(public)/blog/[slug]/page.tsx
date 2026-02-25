@@ -19,18 +19,19 @@ export async function generateMetadata({
   params,
 }: BlogDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  const { data: article } = await supabase
-    .from('articles')
-    .select('title, meta_title, meta_description, excerpt')
-    .eq('slug', slug)
-    .eq('is_published', true)
-    .single();
+    const { data: article } = await supabase
+      .from('articles')
+      .select('title, meta_title, meta_description, excerpt')
+      .eq('slug', slug)
+      .eq('is_published', true)
+      .single();
 
-  if (!article) {
-    return { title: '글을 찾을 수 없습니다' };
-  }
+    if (!article) {
+      return { title: '글을 찾을 수 없습니다' };
+    }
 
   return {
     title: article.meta_title || article.title,
@@ -41,13 +42,23 @@ export async function generateMetadata({
       type: 'article',
     },
   };
+  } catch {
+    return { title: '블로그' };
+  }
 }
 
 export default async function BlogDetailPage({
   params,
 }: BlogDetailPageProps) {
   const { slug } = await params;
-  const supabase = await createClient();
+
+  // eslint-disable-next-line prefer-const
+  let supabase!: Awaited<ReturnType<typeof createClient>>;
+  try {
+    supabase = await createClient();
+  } catch {
+    notFound();
+  }
 
   // Fetch the article
   const { data: article } = await supabase

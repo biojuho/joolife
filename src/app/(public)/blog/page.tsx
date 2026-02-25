@@ -22,21 +22,24 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const params = await searchParams;
   const activeCategory = params.category || 'all';
 
-  const supabase = await createClient();
+  let typedArticles: Article[] = [];
+  try {
+    const supabase = await createClient();
+    let query = supabase
+      .from('articles')
+      .select('*')
+      .eq('is_published', true)
+      .order('published_at', { ascending: false });
 
-  let query = supabase
-    .from('articles')
-    .select('*')
-    .eq('is_published', true)
-    .order('published_at', { ascending: false });
+    if (activeCategory !== 'all') {
+      query = query.eq('category', activeCategory);
+    }
 
-  if (activeCategory !== 'all') {
-    query = query.eq('category', activeCategory);
+    const { data: articles } = await query;
+    typedArticles = (articles ?? []) as Article[];
+  } catch {
+    // Supabase not configured or connection error — show empty state
   }
-
-  const { data: articles } = await query;
-
-  const typedArticles = (articles ?? []) as Article[];
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 md:py-12">
