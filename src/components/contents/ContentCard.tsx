@@ -63,8 +63,9 @@ export default function ContentCard({ content, tags = [] }: ContentCardProps) {
     setMenuOpen(false);
   };
 
+  const [now] = useState(() => Date.now());
   const timeAgo = (dateStr: string) => {
-    const diff = Date.now() - new Date(dateStr).getTime();
+    const diff = now - new Date(dateStr).getTime();
     const minutes = Math.floor(diff / 60000);
     if (minutes < 1) return "방금 전";
     if (minutes < 60) return `${minutes}분 전`;

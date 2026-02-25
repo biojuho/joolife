@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Sparkles,
   Lightbulb,
@@ -64,7 +64,7 @@ export default function RecommendationsPage() {
   const [generatingInsight, setGeneratingInsight] = useState(false);
   const [filter, setFilter] = useState<"all" | "unread" | "saved">("all");
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const [recs, s] = await Promise.all([
@@ -80,11 +80,11 @@ export default function RecommendationsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filter]);
 
   useEffect(() => {
     fetchData();
-  }, [filter]);
+  }, [fetchData]);
 
   const handleGenerate = async () => {
     setGenerating(true);

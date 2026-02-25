@@ -63,9 +63,13 @@ export async function getContents(params?: {
   }
 
   if (params?.search) {
-    query = query.or(
-      `title.ilike.%${params.search}%,description.ilike.%${params.search}%,memo.ilike.%${params.search}%,url.ilike.%${params.search}%`
-    );
+    // PostgREST 특수문자 이스케이프
+    const sanitized = params.search.replace(/[%_,.()"\\]/g, "");
+    if (sanitized) {
+      query = query.or(
+        `title.ilike.%${sanitized}%,description.ilike.%${sanitized}%,memo.ilike.%${sanitized}%,url.ilike.%${sanitized}%`
+      );
+    }
   }
 
   const { data, count, error } = await query;
@@ -94,17 +98,24 @@ export async function getContents(params?: {
 // 콘텐츠 단건 조회
 export async function getContent(id: string) {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("인증이 필요합니다.");
 
   const [contentResult, tagsResult] = await Promise.all([
     supabase
       .from("saved_contents")
       .select("*, categories(id, name, color)")
       .eq("id", id)
+      .eq("user_id", user.id)
       .single(),
     supabase.from("content_tags").select("tag").eq("content_id", id),
   ]);
 
   if (contentResult.error) throw new Error(contentResult.error.message);
+  if (tagsResult.error) throw new Error(tagsResult.error.message);
 
   return {
     ...contentResult.data,
@@ -145,12 +156,13 @@ export async function createContent(input: CreateContentInput) {
 
   // 태그 추가
   if (input.tags && input.tags.length > 0) {
-    await supabase.from("content_tags").insert(
+    const { error: tagError } = await supabase.from("content_tags").insert(
       input.tags.map((tag) => ({
         content_id: data.id,
         tag: tag.trim(),
       }))
     );
+    if (tagError) console.error("Tag insert error:", tagError.message);
   }
 
   // 활동 로그
@@ -171,6 +183,11 @@ export async function createContent(input: CreateContentInput) {
 // 콘텐츠 수정
 export async function updateContent(input: UpdateContentInput) {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("인증이 필요합니다.");
 
   const { tags, id, ...updateData } = input;
 
@@ -178,6 +195,7 @@ export async function updateContent(input: UpdateContentInput) {
     .from("saved_contents")
     .update(updateData)
     .eq("id", id)
+    .eq("user_id", user.id)
     .select()
     .single();
 
@@ -185,15 +203,20 @@ export async function updateContent(input: UpdateContentInput) {
 
   // 태그 업데이트
   if (tags !== undefined) {
-    await supabase.from("content_tags").delete().eq("content_id", id);
+    const { error: deleteTagError } = await supabase
+      .from("content_tags")
+      .delete()
+      .eq("content_id", id);
+    if (deleteTagError) console.error("Tag delete error:", deleteTagError.message);
 
     if (tags.length > 0) {
-      await supabase.from("content_tags").insert(
+      const { error: insertTagError } = await supabase.from("content_tags").insert(
         tags.map((tag) => ({
           content_id: id,
           tag: tag.trim(),
         }))
       );
+      if (insertTagError) console.error("Tag insert error:", insertTagError.message);
     }
   }
 
@@ -206,11 +229,17 @@ export async function updateContent(input: UpdateContentInput) {
 // 콘텐츠 삭제
 export async function deleteContent(id: string) {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("인증이 필요합니다.");
 
   const { error } = await supabase
     .from("saved_contents")
     .delete()
-    .eq("id", id);
+    .eq("id", id)
+    .eq("user_id", user.id);
 
   if (error) throw new Error(error.message);
 

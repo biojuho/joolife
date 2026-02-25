@@ -58,11 +58,17 @@ export async function updateCategory(
   input: { name?: string; color?: string; icon?: string; sort_order?: number }
 ) {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("인증이 필요합니다.");
 
   const { data, error } = await supabase
     .from("categories")
     .update(input)
     .eq("id", id)
+    .eq("user_id", user.id)
     .select()
     .single();
 
@@ -75,8 +81,17 @@ export async function updateCategory(
 // 카테고리 삭제
 export async function deleteCategory(id: string) {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const { error } = await supabase.from("categories").delete().eq("id", id);
+  if (!user) throw new Error("인증이 필요합니다.");
+
+  const { error } = await supabase
+    .from("categories")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", user.id);
 
   if (error) throw new Error(error.message);
 
@@ -97,11 +112,20 @@ export async function getPopularTags(limit: number = 20) {
     p_limit: limit,
   });
 
-  // RPC가 없으면 직접 쿼리
+  // RPC가 없으면 직접 쿼리 (현재 유저의 콘텐츠만)
   if (error) {
+    const { data: userContents } = await supabase
+      .from("saved_contents")
+      .select("id")
+      .eq("user_id", user.id);
+
+    if (!userContents || userContents.length === 0) return [];
+
+    const contentIds = userContents.map((c) => c.id);
     const { data: tags } = await supabase
       .from("content_tags")
       .select("tag, content_id")
+      .in("content_id", contentIds)
       .limit(200);
 
     if (!tags) return [];
