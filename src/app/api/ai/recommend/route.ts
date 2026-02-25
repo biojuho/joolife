@@ -14,11 +14,13 @@ export async function POST() {
     }
 
     // 사용자 프로필 (관심사)
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("interests")
       .eq("id", user.id)
       .single();
+
+    if (profileError) console.error("Profile query error:", profileError.message);
 
     // 최근 콘텐츠 20개
     const { data: contents } = await supabase
@@ -64,7 +66,7 @@ export async function POST() {
 
     // DB에 저장
     if (recommendations.length > 0) {
-      const { data: savedRecs } = await supabase
+      const { data: savedRecs, error: saveError } = await supabase
         .from("recommendations")
         .insert(
           recommendations.map((r) => ({
@@ -77,6 +79,11 @@ export async function POST() {
           }))
         )
         .select();
+
+      if (saveError) {
+        console.error("Recommendation save error:", saveError.message);
+        return NextResponse.json({ error: "추천 저장에 실패했습니다." }, { status: 500 });
+      }
 
       // 활동 로그
       await supabase.from("activity_logs").insert({

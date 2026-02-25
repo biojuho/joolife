@@ -21,6 +21,18 @@ export async function POST(request: NextRequest) {
 
     // content_id가 있으면 DB 업데이트 (소유권 검증)
     if (content_id) {
+      // 소유권 확인
+      const { data: owned, error: ownError } = await supabase
+        .from("saved_contents")
+        .select("id")
+        .eq("id", content_id)
+        .eq("user_id", user.id)
+        .single();
+
+      if (ownError || !owned) {
+        return NextResponse.json({ error: "콘텐츠를 찾을 수 없습니다." }, { status: 404 });
+      }
+
       // 설명 업데이트
       if (result.summary) {
         await supabase

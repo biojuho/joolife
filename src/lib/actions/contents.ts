@@ -115,6 +115,7 @@ export async function getContent(id: string) {
   ]);
 
   if (contentResult.error) throw new Error(contentResult.error.message);
+  if (tagsResult.error) throw new Error(tagsResult.error.message);
 
   return {
     ...contentResult.data,
@@ -155,12 +156,13 @@ export async function createContent(input: CreateContentInput) {
 
   // 태그 추가
   if (input.tags && input.tags.length > 0) {
-    await supabase.from("content_tags").insert(
+    const { error: tagError } = await supabase.from("content_tags").insert(
       input.tags.map((tag) => ({
         content_id: data.id,
         tag: tag.trim(),
       }))
     );
+    if (tagError) console.error("Tag insert error:", tagError.message);
   }
 
   // 활동 로그
@@ -201,15 +203,20 @@ export async function updateContent(input: UpdateContentInput) {
 
   // 태그 업데이트
   if (tags !== undefined) {
-    await supabase.from("content_tags").delete().eq("content_id", id);
+    const { error: deleteTagError } = await supabase
+      .from("content_tags")
+      .delete()
+      .eq("content_id", id);
+    if (deleteTagError) console.error("Tag delete error:", deleteTagError.message);
 
     if (tags.length > 0) {
-      await supabase.from("content_tags").insert(
+      const { error: insertTagError } = await supabase.from("content_tags").insert(
         tags.map((tag) => ({
           content_id: id,
           tag: tag.trim(),
         }))
       );
+      if (insertTagError) console.error("Tag insert error:", insertTagError.message);
     }
   }
 

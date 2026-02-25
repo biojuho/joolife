@@ -95,21 +95,25 @@ export async function disconnectWallet(id: string): Promise<void> {
 
   if (!user) return;
 
-  const { data: wallet } = await supabase
+  const { data: wallet, error: walletError } = await supabase
     .from("wallet_connections")
     .select("is_primary")
     .eq("id", id)
     .eq("user_id", user.id)
     .single();
 
-  await supabase
+  if (walletError || !wallet) return;
+
+  const { error: deleteError } = await supabase
     .from("wallet_connections")
     .delete()
     .eq("id", id)
     .eq("user_id", user.id);
 
+  if (deleteError) throw new Error(deleteError.message);
+
   // primary 지갑을 삭제했으면 다른 지갑을 primary로
-  if (wallet?.is_primary) {
+  if (wallet.is_primary) {
     const { data: remaining } = await supabase
       .from("wallet_connections")
       .select("id")
@@ -120,7 +124,8 @@ export async function disconnectWallet(id: string): Promise<void> {
       await supabase
         .from("wallet_connections")
         .update({ is_primary: true })
-        .eq("id", remaining[0].id);
+        .eq("id", remaining[0].id)
+        .eq("user_id", user.id);
     }
   }
 
