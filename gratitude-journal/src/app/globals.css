@@ -141,3 +141,8 @@
   from { max-height: 0; }
   to { max-height: 500px; }
 }
+
+/* iOS safe area for bottom navigation */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}

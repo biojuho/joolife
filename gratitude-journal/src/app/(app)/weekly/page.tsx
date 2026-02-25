@@ -14,7 +14,7 @@ import {
 } from "date-fns";
 import { ko } from "date-fns/locale";
 import type { WeeklySummary, WeeklySummaryResponse } from "@/lib/types";
-import { MOOD_EMOJIS } from "@/lib/types";
+import { getMoodEmoji } from "@/lib/types";
 
 export default function WeeklyPage() {
   const supabase = createClient();
@@ -87,14 +87,17 @@ export default function WeeklyPage() {
         }),
       });
 
+      if (!res.ok) throw new Error("주간 요약 생성 실패");
+
       const data = await res.json();
       if (data.summary) {
         setCurrentSummary(data.summary);
         setThisWeekExists(true);
         fetchData();
       }
-    } catch {
-      // Error handling
+    } catch (err) {
+      console.error("Weekly summary error:", err);
+      alert("주간 요약 생성 중 오류가 발생했어요. 다시 시도해 주세요.");
     }
     setGenerating(false);
   };
@@ -243,7 +246,7 @@ export default function WeeklyPage() {
                     </span>
                     {summary.avg_mood && (
                       <span>
-                        {MOOD_EMOJIS[Math.round(summary.avg_mood) - 1]}
+                        {getMoodEmoji(Math.round(summary.avg_mood))}
                       </span>
                     )}
                   </div>

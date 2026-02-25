@@ -9,7 +9,7 @@ import { ArrowLeft, Sparkles, Trash2 } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { ko } from "date-fns/locale";
 import type { JournalEntry } from "@/lib/types";
-import { MOOD_EMOJIS } from "@/lib/types";
+import { getMoodEmoji } from "@/lib/types";
 
 export default function EntryDetailPage() {
   const params = useParams();
@@ -42,10 +42,11 @@ export default function EntryDetailPage() {
       } = await supabase.auth.getUser();
       if (!user) return;
 
+      const id = Array.isArray(params.id) ? params.id[0] : params.id;
       const { data } = await supabase
         .from("journal_entries")
         .select("*")
-        .eq("id", params.id)
+        .eq("id", id)
         .eq("user_id", user.id)
         .single();
 
@@ -93,7 +94,7 @@ export default function EntryDetailPage() {
         </p>
         {entry.mood_score && (
           <span className="text-2xl">
-            {MOOD_EMOJIS[entry.mood_score - 1]}
+            {getMoodEmoji(entry.mood_score)}
           </span>
         )}
       </div>

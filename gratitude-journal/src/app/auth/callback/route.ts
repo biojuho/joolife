@@ -19,11 +19,20 @@ export async function GET(request: Request) {
           .from("profiles")
           .select("nickname")
           .eq("id", user.id)
-          .single();
+          .maybeSingle();
 
         if (!profile?.nickname) {
           return NextResponse.redirect(`${origin}/onboarding`);
         }
+        // 온보딩 완료 사용자 — 쿠키 설정
+        const response = NextResponse.redirect(`${origin}${next}`);
+        response.cookies.set("onboarding_complete", "1", {
+          path: "/",
+          maxAge: 60 * 60 * 24 * 365,
+          httpOnly: true,
+          sameSite: "lax",
+        });
+        return response;
       }
       return NextResponse.redirect(`${origin}${next}`);
     }

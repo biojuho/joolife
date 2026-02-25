@@ -2,9 +2,15 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase/server";
 import { REFLECTION_SYSTEM_PROMPT } from "@/lib/prompts";
 import { NextResponse } from "next/server";
+import { getKSTYesterdayString } from "@/lib/date-utils";
 
 export async function POST(req: Request) {
-  const { entryId, userAnswer } = await req.json();
+  const body = await req.json();
+  const { entryId, userAnswer } = body;
+
+  if (!entryId || !userAnswer) {
+    return NextResponse.json({ error: "entryId and userAnswer are required" }, { status: 400 });
+  }
   const supabase = await createClient();
   const {
     data: { user },
@@ -66,7 +72,7 @@ ${
   });
 
   const responseText =
-    message.content[0].type === "text" ? message.content[0].text : "";
+    message.content[0]?.type === "text" ? message.content[0].text : "";
 
   let reflection;
   try {
@@ -93,39 +99,15 @@ ${
     })
     .eq("id", entryId);
 
-  // 스트릭 업데이트
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("streak_count, longest_streak, total_entries")
-    .eq("id", user.id)
-    .single();
+  // 스트릭 업데이트 (원자적 RPC 호출)
+  const yesterdayStr = getKSTYesterdayString();
+  const { error: rpcError } = await supabase.rpc("increment_streak", {
+    p_user_id: user.id,
+    p_yesterday_date: yesterdayStr,
+  });
 
-  if (profile) {
-    // 어제 엔트리 확인
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toISOString().split("T")[0];
-
-    const { data: yesterdayEntry } = await supabase
-      .from("journal_entries")
-      .select("id")
-      .eq("user_id", user.id)
-      .eq("entry_date", yesterdayStr)
-      .neq("user_answer", "")
-      .single();
-
-    const newStreak = yesterdayEntry ? profile.streak_count + 1 : 1;
-    const newLongest = Math.max(newStreak, profile.longest_streak);
-
-    await supabase
-      .from("profiles")
-      .update({
-        streak_count: newStreak,
-        longest_streak: newLongest,
-        total_entries: profile.total_entries + 1,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", user.id);
+  if (rpcError) {
+    console.error("Failed to update streak:", rpcError);
   }
 
   return NextResponse.json({ reflection });

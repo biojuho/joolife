@@ -110,3 +110,9 @@ export const LIFE_THEMES = [
 ] as const;
 
 export const MOOD_EMOJIS = ["😢", "😟", "😐", "🙂", "😊"] as const;
+
+/** mood_score(1-5)를 이모지로 안전하게 변환 */
+export function getMoodEmoji(score: number | null | undefined): string {
+  if (!score || score < 1 || score > 5) return "❓";
+  return MOOD_EMOJIS[score - 1];
+}

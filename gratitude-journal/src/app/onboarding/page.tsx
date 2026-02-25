@@ -36,17 +36,20 @@ export default function OnboardingPage() {
       return;
     }
 
+    const year = birthYear ? parseInt(birthYear, 10) : null;
     const { error } = await supabase
       .from("profiles")
       .update({
         nickname,
-        birth_year: birthYear ? parseInt(birthYear) : null,
+        birth_year: year && !isNaN(year) && year >= 1920 && year <= 2010 ? year : null,
         life_theme: selectedThemes,
         updated_at: new Date().toISOString(),
       })
       .eq("id", user.id);
 
     if (!error) {
+      // 온보딩 완료 쿠키 설정
+      document.cookie = "onboarding_complete=1; path=/; max-age=31536000; samesite=lax";
       router.push("/journal");
     }
     setLoading(false);

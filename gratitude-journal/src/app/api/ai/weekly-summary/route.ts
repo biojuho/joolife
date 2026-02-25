@@ -70,7 +70,7 @@ ${entries
   });
 
   const responseText =
-    message.content[0].type === "text" ? message.content[0].text : "";
+    message.content[0]?.type === "text" ? message.content[0].text : "";
 
   let summary;
   try {

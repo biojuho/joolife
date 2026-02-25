@@ -48,16 +48,26 @@ export async function updateSession(request: NextRequest) {
 
   // 온보딩 완료 여부 체크 (인증된 사용자, 온보딩 페이지가 아닌 경우)
   if (user && !isPublicPath && request.nextUrl.pathname !== "/onboarding") {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("nickname")
-      .eq("id", user.id)
-      .single();
+    const onboardingCookie = request.cookies.get("onboarding_complete");
+    if (!onboardingCookie) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("nickname")
+        .eq("id", user.id)
+        .maybeSingle();
 
-    if (!profile?.nickname) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/onboarding";
-      return NextResponse.redirect(url);
+      if (!profile?.nickname) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/onboarding";
+        return NextResponse.redirect(url);
+      }
+      // 온보딩 완료 확인됨 — 쿠키 설정으로 이후 요청에서 DB 조회 스킵
+      supabaseResponse.cookies.set("onboarding_complete", "1", {
+        path: "/",
+        maxAge: 60 * 60 * 24 * 365, // 1년
+        httpOnly: true,
+        sameSite: "lax",
+      });
     }
   }
 

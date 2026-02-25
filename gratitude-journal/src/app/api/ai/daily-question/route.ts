@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase/server";
 import { DAILY_QUESTION_SYSTEM_PROMPT } from "@/lib/prompts";
 import { NextResponse } from "next/server";
+import { getKSTDateString } from "@/lib/date-utils";
 
 export async function GET() {
   const supabase = await createClient();
@@ -13,8 +14,8 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // 오늘 이미 엔트리가 있는지 확인
-  const today = new Date().toISOString().split("T")[0];
+  // 오늘 이미 엔트리가 있는지 확인 (KST 기준)
+  const today = getKSTDateString();
   const { data: existing } = await supabase
     .from("journal_entries")
     .select("*")
@@ -74,7 +75,7 @@ ${
   });
 
   const responseText =
-    message.content[0].type === "text" ? message.content[0].text : "";
+    message.content[0]?.type === "text" ? message.content[0].text : "";
 
   let aiResponse;
   try {

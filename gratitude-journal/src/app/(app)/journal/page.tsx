@@ -115,14 +115,17 @@ export default function JournalPage() {
         }),
       });
 
+      if (!res.ok) throw new Error("리플렉션 생성 실패");
+
       const data = await res.json();
       if (data.reflection) {
         setReflection(data.reflection.reflection);
         setShowReflection(true);
         setStreak((prev) => prev + 1);
       }
-    } catch {
-      // Error handling
+    } catch (err) {
+      console.error("Reflection error:", err);
+      alert("답변 저장 중 오류가 발생했어요. 다시 시도해 주세요.");
     }
     setSubmitting(false);
   };

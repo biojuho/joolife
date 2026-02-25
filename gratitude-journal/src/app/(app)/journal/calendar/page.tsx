@@ -19,7 +19,7 @@ import {
 } from "date-fns";
 import { ko } from "date-fns/locale";
 import type { JournalEntry } from "@/lib/types";
-import { MOOD_EMOJIS } from "@/lib/types";
+import { getMoodEmoji } from "@/lib/types";
 
 export default function CalendarPage() {
   const supabase = createClient();
@@ -153,7 +153,7 @@ export default function CalendarPage() {
                   {entry && (
                     <span className="text-xs">
                       {entry.mood_score
-                        ? MOOD_EMOJIS[entry.mood_score - 1]
+                        ? getMoodEmoji(entry.mood_score)
                         : "✍️"}
                     </span>
                   )}
@@ -178,14 +178,15 @@ export default function CalendarPage() {
           <Card className="border-warm-200 bg-warm-50">
             <CardContent className="py-4 text-center">
               <p className="text-3xl font-bold text-warm-700">
-                {entries.length > 0
-                  ? (
-                      entries
-                        .filter((e) => e.mood_score)
-                        .reduce((sum, e) => sum + (e.mood_score || 0), 0) /
-                      entries.filter((e) => e.mood_score).length
-                    ).toFixed(1)
-                  : "-"}
+                {(() => {
+                  const moodEntries = entries.filter((e) => e.mood_score);
+                  return moodEntries.length > 0
+                    ? (
+                        moodEntries.reduce((sum, e) => sum + (e.mood_score || 0), 0) /
+                        moodEntries.length
+                      ).toFixed(1)
+                    : "-";
+                })()}
               </p>
               <p className="text-sm text-warm-500">평균 기분</p>
             </CardContent>

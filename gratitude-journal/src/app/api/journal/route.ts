@@ -42,7 +42,17 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { id } = await req.json();
+  let body;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+
+  const { id } = body;
+  if (!id) {
+    return NextResponse.json({ error: "id is required" }, { status: 400 });
+  }
 
   const { error } = await supabase
     .from("journal_entries")
@@ -62,13 +72,17 @@ export async function DELETE(req: Request) {
     .single();
 
   if (profile && profile.total_entries > 0) {
-    await supabase
+    const { error: updateError } = await supabase
       .from("profiles")
       .update({
         total_entries: profile.total_entries - 1,
         updated_at: new Date().toISOString(),
       })
       .eq("id", user.id);
+
+    if (updateError) {
+      console.error("Failed to decrement total_entries:", updateError);
+    }
   }
 
   return NextResponse.json({ success: true });
