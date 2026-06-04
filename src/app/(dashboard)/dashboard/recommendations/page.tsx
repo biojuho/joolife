@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import {
   Sparkles,
   Lightbulb,
@@ -15,6 +15,8 @@ import {
   Clock,
   ChevronRight,
 } from "lucide-react";
+import { useRelativeNow } from "@/hooks/useRelativeNow";
+import { formatRelativeTime } from "@/lib/time";
 import {
   getRecommendations,
   getRecommendationStats,
@@ -63,8 +65,9 @@ export default function RecommendationsPage() {
   const [generating, setGenerating] = useState(false);
   const [generatingInsight, setGeneratingInsight] = useState(false);
   const [filter, setFilter] = useState<"all" | "unread" | "saved">("all");
+  const relativeNow = useRelativeNow();
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const [recs, s] = await Promise.all([
@@ -80,11 +83,11 @@ export default function RecommendationsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filter]);
 
   useEffect(() => {
-    fetchData();
-  }, [filter]);
+    void fetchData();
+  }, [fetchData]);
 
   const handleGenerate = async () => {
     setGenerating(true);
@@ -149,18 +152,6 @@ export default function RecommendationsPage() {
       ...prev,
       unread: Math.max(0, prev.unread - 1),
     }));
-  };
-
-  const timeAgo = (dateStr: string) => {
-    const diff = Date.now() - new Date(dateStr).getTime();
-    const minutes = Math.floor(diff / 60000);
-    if (minutes < 1) return "방금 전";
-    if (minutes < 60) return `${minutes}분 전`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}시간 전`;
-    const days = Math.floor(hours / 24);
-    if (days < 7) return `${days}일 전`;
-    return new Date(dateStr).toLocaleDateString("ko-KR");
   };
 
   return (
@@ -338,7 +329,9 @@ export default function RecommendationsPage() {
                           <div className="flex items-center gap-2 mt-0.5">
                             <Clock size={10} className="text-[#A3A39E]" />
                             <span className="text-[10px] text-[#A3A39E]">
-                              {timeAgo(rec.created_at)}
+                              {formatRelativeTime(rec.created_at, relativeNow, {
+                                dateFallbackDays: 7,
+                              })}
                             </span>
                             {!rec.is_read && (
                               <span className="w-1.5 h-1.5 rounded-full bg-accent" />
