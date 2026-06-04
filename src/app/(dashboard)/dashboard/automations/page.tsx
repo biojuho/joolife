@@ -12,10 +12,10 @@ import {
   Power,
   Clock,
   CheckCircle,
-  XCircle,
-  AlertTriangle,
   Activity,
 } from "lucide-react";
+import { useRelativeNow } from "@/hooks/useRelativeNow";
+import { formatRelativeTime } from "@/lib/time";
 import {
   getAutomations,
   getAutomationStats,
@@ -58,6 +58,7 @@ export default function AutomationsPage() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const relativeNow = useRelativeNow();
 
   const fetchData = async () => {
     setLoading(true);
@@ -101,18 +102,6 @@ export default function AutomationsPage() {
       total: prev.total - 1,
     }));
     setOpenMenuId(null);
-  };
-
-  const timeAgo = (dateStr: string | null) => {
-    if (!dateStr) return "실행 전";
-    const diff = Date.now() - new Date(dateStr).getTime();
-    const minutes = Math.floor(diff / 60000);
-    if (minutes < 1) return "방금 전";
-    if (minutes < 60) return `${minutes}분 전`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}시간 전`;
-    const days = Math.floor(hours / 24);
-    return `${days}일 전`;
   };
 
   return (
@@ -275,7 +264,10 @@ export default function AutomationsPage() {
                       )}
                       <span className="flex items-center gap-1 text-[#A3A39E]">
                         <Activity size={11} />
-                        마지막 실행: {timeAgo(automation.last_run_at)}
+                        마지막 실행:{" "}
+                        {formatRelativeTime(automation.last_run_at, relativeNow, {
+                          emptyLabel: "실행 전",
+                        })}
                       </span>
                     </div>
 

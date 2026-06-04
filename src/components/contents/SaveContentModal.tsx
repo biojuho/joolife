@@ -1,7 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Link2, FileText, Image, Tag, FolderOpen } from "lucide-react";
+import {
+  X,
+  Link2,
+  FileText,
+  Image as ImageIcon,
+  Tag,
+  FolderOpen,
+} from "lucide-react";
 import { createContent, type ContentType } from "@/lib/actions/contents";
 import { getCategories } from "@/lib/actions/categories";
 
@@ -14,7 +21,7 @@ interface SaveContentModalProps {
 const contentTypes = [
   { type: "url" as ContentType, icon: Link2, label: "URL" },
   { type: "memo" as ContentType, icon: FileText, label: "메모" },
-  { type: "image" as ContentType, icon: Image, label: "이미지" },
+  { type: "image" as ContentType, icon: ImageIcon, label: "이미지" },
 ];
 
 interface Category {
@@ -187,7 +194,7 @@ export default function SaveContentModal({
           {/* Image placeholder */}
           {type === "image" && (
             <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center">
-              <Image size={32} className="text-[#D1D1CC] mx-auto mb-3" />
+              <ImageIcon size={32} className="text-[#D1D1CC] mx-auto mb-3" />
               <p className="text-sm text-[#6B6B66]">
                 이미지 업로드 기능은 곧 지원됩니다.
               </p>
